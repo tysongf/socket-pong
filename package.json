@@ -1,0 +1,24 @@
+{
+   "name": "socket-pong",
+   "version": "0.0.1",
+   "description": "Multiplayer Pong with Socket.io",
+   "main": "socket-pong.js",
+   "scripts": {
+      "start": "nodemon server.js",
+      "test": "echo \"Error: no test specified\" && exit 1"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/tysongf/socket-pong.git"
+   },
+   "keywords": [
+      "socket.io",
+      "pong"
+   ],
+   "author": "Tyson G Fritz",
+   "license": "Unlicense",
+   "bugs": {
+      "url": "https://github.com/tysongf/socket-pong/issues"
+   },
+   "homepage": "https://github.com/tysongf/socket-pong#readme"
+}
