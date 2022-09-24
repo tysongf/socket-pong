@@ -1,16 +1,17 @@
 let numPlayersReady = 0;
 
 function listen(io) {
-   io.on("connection", (socket) => {
+   const pongNamespace = io.of("/pong");
+   pongNamespace.on("connection", (socket) => {
       console.log(`User Connected: ${socket.id}`);
 
       socket.on("ready", () => {
-         console.log(`Plaer ready: ${socket.id}`);
+         console.log(`Player ready: ${socket.id}`);
          numPlayersReady++;
          if (numPlayersReady == 2) {
             //second player assigned as host.
             // emit startGame to all connected clients.
-            io.emit("startGame", socket.id);
+            pongNamespace.emit("startGame", socket.id);
             numPlayersReady = 0;
          }
       });
