@@ -101,7 +101,7 @@ function ballMove() {
    }
 
    if (isHost) {
-      socket.emit("ballMove", { ballX, ballY });
+      socket.emit("ballMove", { ballX, ballY, score });
    }
 }
 
@@ -219,7 +219,6 @@ socket.on("paddleMove", (paddleData) => {
    paddleX[1 - paddleIndex] = paddleData.xPosition;
 });
 
-socket.on("ballMove", (ballPosition) => {
-   ballX = ballPosition.ballX;
-   ballY = ballPosition.ballY;
+socket.on("ballMove", (ballData) => {
+   ({ ballX, ballY, score } = ballData);
 });
