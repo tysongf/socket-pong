@@ -2,7 +2,7 @@
    "name": "socket-pong",
    "version": "0.0.1",
    "description": "Multiplayer Pong with Socket.io",
-   "main": "socket-pong.js",
+   "main": "server.js",
    "scripts": {
       "start": "nodemon server.js",
       "test": "echo \"Error: no test specified\" && exit 1"
@@ -20,5 +20,9 @@
    "bugs": {
       "url": "https://github.com/tysongf/socket-pong/issues"
    },
-   "homepage": "https://github.com/tysongf/socket-pong#readme"
+   "homepage": "https://github.com/tysongf/socket-pong#readme",
+   "dependencies": {
+      "cors": "^2.8.5",
+      "socket.io": "^4.5.2"
+   }
 }

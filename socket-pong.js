@@ -1,7 +1,9 @@
 // Canvas Related
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
+const socket = io("localhost:3000");
 let paddleIndex = 0;
+let isHost = false;
 
 let width = 500;
 let height = 700;
@@ -38,16 +40,14 @@ function createCanvas() {
 }
 
 // Wait for Opponents
-// function renderIntro() {
-//   // Canvas Background
-//   context.fillStyle = 'black';
-//   context.fillRect(0, 0, width, height);
-
-//   // Intro Text
-//   context.fillStyle = 'white';
-//   context.font = "32px Courier New";
-//   context.fillText("Waiting for opponent...", 20, (canvas.height / 2) - 30);
-// }
+function renderIntro() {
+   // Canvas Background
+   context.fillStyle = "black";
+   context.fillRect(0, 0, width, height); // Intro Text
+   context.fillStyle = "white";
+   context.font = "32px Courier New";
+   context.fillText("Waiting for opponent...", 20, canvas.height / 2 - 30);
+}
 
 // Render Everything on Canvas
 function renderCanvas() {
@@ -98,6 +98,10 @@ function ballMove() {
    // Horizontal Speed
    if (playerMoved) {
       ballX += speedX;
+   }
+
+   if (isHost) {
+      socket.emit("ballMove", { ballX, ballY });
    }
 }
 
@@ -156,37 +160,27 @@ function ballBoundaries() {
    }
 }
 
-// Computer Movement
-function computerAI() {
-   if (playerMoved) {
-      if (paddleX[1] + paddleDiff < ballX) {
-         paddleX[1] += computerSpeed;
-      } else {
-         paddleX[1] -= computerSpeed;
-      }
-      if (paddleX[1] < 0) {
-         paddleX[1] = 0;
-      } else if (paddleX[1] > width - paddleWidth) {
-         paddleX[1] = width - paddleWidth;
-      }
-   }
-}
-
 // Called Every Frame
 function animate() {
-   computerAI();
-   ballMove();
+   if (isHost) {
+      ballMove();
+   }
    renderCanvas();
    ballBoundaries();
    window.requestAnimationFrame(animate);
 }
 
-// Start Game, Reset Everything
-function startGame() {
+// Load Game, Reset Everything
+function loadGame() {
    createCanvas();
-   // renderIntro();
+   renderIntro();
 
-   paddleIndex = 0;
+   socket.emit("ready");
+}
+
+//Start Game
+function startGame() {
+   paddleIndex = isHost ? 0 : 1;
    window.requestAnimationFrame(animate);
    canvas.addEventListener("mousemove", (e) => {
       playerMoved = true;
@@ -197,10 +191,35 @@ function startGame() {
       if (paddleX[paddleIndex] > width - paddleWidth) {
          paddleX[paddleIndex] = width - paddleWidth;
       }
+
+      socket.emit("paddleMove", {
+         //emit this player's paddle position
+         xPosition: paddleX[paddleIndex],
+      });
+
       // Hide Cursor
       canvas.style.cursor = "none";
    });
 }
 
 // On Load
-startGame();
+loadGame();
+
+socket.on("connect", () => {
+   console.log("Connected as...", socket.id);
+});
+
+socket.on("startGame", (hostId) => {
+   console.log(`Host ID: ${hostId}`);
+   isHost = socket.id === hostId;
+   startGame();
+});
+
+socket.on("paddleMove", (paddleData) => {
+   paddleX[1 - paddleIndex] = paddleData.xPosition;
+});
+
+socket.on("ballMove", (ballPosition) => {
+   ballX = ballPosition.ballX;
+   ballY = ballPosition.ballY;
+});
